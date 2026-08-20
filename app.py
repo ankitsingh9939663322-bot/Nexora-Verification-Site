@@ -7,7 +7,6 @@ app = Flask(__name__)
 SESSION_SECRET = os.environ.get("SESSION_SECRET")
 VERIFY_PASSWORD = os.environ.get("VERIFY_PASSWORD")
 
-# Require secrets to be configured in the deployment environment.
 if not SESSION_SECRET:
     raise RuntimeError("SESSION_SECRET environment variable is not configured.")
 
@@ -36,27 +35,18 @@ def home():
 
 @app.route("/verify/<employee_id>", methods=["GET", "POST"])
 def verify(employee_id):
-
-    # Check whether the requested employee record exists.
     if employee_id != EMPLOYEE["id"]:
         return render_template("invalid.html"), 404
 
     error = None
-
-    # Check whether this employee has already been verified
-    # in the current browser session.
     verified = session.get("verified_employee") == employee_id
 
     if request.method == "POST":
-
         password = request.form.get("password", "")
 
         if password == VERIFY_PASSWORD:
             session["verified_employee"] = employee_id
-
-            return redirect(
-                url_for("verify", employee_id=employee_id)
-            )
+            return redirect(url_for("verify", employee_id=employee_id))
 
         error = "Invalid verification password."
         verified = False
@@ -71,8 +61,6 @@ def verify(employee_id):
 
 @app.route("/logout")
 def logout():
-
-    # Remove the verification status from the current session.
     session.pop("verified_employee", None)
 
     return redirect(
@@ -84,11 +72,9 @@ def logout():
 
 
 if __name__ == "__main__":
-
     port = int(os.environ.get("PORT", 5000))
 
     app.run(
         host="0.0.0.0",
         port=port
     )
-```
