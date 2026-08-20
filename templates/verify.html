@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Nexora Data Solution — Employee Verification</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    background:
+        radial-gradient(circle at top right, rgba(23,105,194,.10), transparent 30%),
+        linear-gradient(135deg,#f5f8fc,#eef3f8);
+    color:#17212b;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+.header{
+    background:linear-gradient(135deg,#041f3d,#0a3b6d);
+    color:#fff;
+    padding:25px 18px;
+    text-align:center;
+    box-shadow:0 4px 18px rgba(4,31,61,.18);
+}
+
+.brand{
+    font-size:25px;
+    font-weight:800;
+    letter-spacing:1.2px;
+}
+
+.subbrand{
+    font-size:11px;
+    letter-spacing:3px;
+    margin-top:5px;
+    opacity:.82;
+}
+
+.wrap{
+    max-width:850px;
+    margin:34px auto;
+    padding:0 16px;
+}
+
+.card{
+    background:rgba(255,255,255,.98);
+    border:1px solid #dce5ee;
+    border-radius:20px;
+    box-shadow:0 15px 45px rgba(15,35,55,.10);
+    padding:32px;
+}
+
+.portal-icon{
+    width:58px;
+    height:58px;
+    margin:0 auto 16px;
+    border-radius:50%;
+    background:#eaf3fc;
+    border:1px solid #cfe2f5;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#1769c2;
+    font-size:25px;
+    font-weight:800;
+}
+
+h1{
+    margin:0 0 9px;
+    text-align:center;
+    color:#062a50;
+    font-size:26px;
+}
+
+.muted{
+    text-align:center;
+    color:#64748b;
+    line-height:1.6;
+    font-size:14px;
+}
+
+.security-note{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:7px;
+    margin:18px auto 22px;
+    color:#475569;
+    font-size:12px;
+    font-weight:700;
+}
+
+.security-dot{
+    width:8px;
+    height:8px;
+    background:#18a566;
+    border-radius:50%;
+    box-shadow:0 0 0 4px rgba(24,165,102,.10);
+}
+
+.form{
+    max-width:430px;
+    margin:25px auto 8px;
+}
+
+.label{
+    font-size:13px;
+    font-weight:700;
+    color:#334155;
+    display:block;
+    margin-bottom:8px;
+}
+
+.input-wrap{
+    position:relative;
+}
+
+input{
+    width:100%;
+    padding:14px 48px 14px 15px;
+    border:1px solid #cbd5e1;
+    border-radius:11px;
+    font-size:16px;
+    outline:none;
+    background:#fff;
+    transition:.2s;
+}
+
+input:focus{
+    border-color:#1769c2;
+    box-shadow:0 0 0 4px rgba(23,105,194,.10);
+}
+
+.toggle{
+    position:absolute;
+    right:8px;
+    top:50%;
+    transform:translateY(-50%);
+    width:34px;
+    height:34px;
+    margin:0;
+    padding:0;
+    background:transparent;
+    color:#64748b;
+    font-size:13px;
+    border:0;
+}
+
+.toggle:hover{
+    background:#f1f5f9;
+    color:#1769c2;
+}
+
+button.verify-btn{
+    width:100%;
+    margin-top:14px;
+    padding:15px;
+    border:0;
+    border-radius:11px;
+    background:linear-gradient(135deg,#1769c2,#0b4f94);
+    color:#fff;
+    font-weight:800;
+    font-size:14px;
+    letter-spacing:.3px;
+    cursor:pointer;
+    box-shadow:0 7px 18px rgba(23,105,194,.20);
+    transition:.2s;
+}
+
+button.verify-btn:hover{
+    transform:translateY(-1px);
+    box-shadow:0 10px 22px rgba(23,105,194,.26);
+}
+
+.error{
+    background:#fff1f1;
+    color:#a32121;
+    border:1px solid #f0caca;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:13px;
+    font-size:13px;
+    text-align:center;
+}
+
+.verified{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    background:#edf9f2;
+    color:#137a47;
+    border:1px solid #b8dec8;
+    padding:14px;
+    border-radius:11px;
+    text-align:center;
+    font-weight:800;
+    margin-bottom:25px;
+}
+
+.section-title{
+    color:#062a50;
+    font-size:15px;
+    font-weight:800;
+    margin:25px 0 11px;
+    padding-bottom:9px;
+    border-bottom:2px solid #edf1f5;
+}
+
+.profile{
+    display:grid;
+    grid-template-columns:175px 1fr;
+    gap:25px;
+    align-items:start;
+}
+
+.photo-frame{
+    width:175px;
+    padding:7px;
+    background:#fff;
+    border:1px solid #d7e0e8;
+    border-radius:15px;
+    box-shadow:0 7px 20px rgba(15,35,55,.08);
+}
+
+.photo{
+    display:block;
+    width:100%;
+    height:220px;
+    object-fit:contain;
+    background:#f5f7fa;
+    border-radius:10px;
+}
+
+.profile-meta{
+    background:#fbfcfe;
+    border:1px solid #e5ebf1;
+    border-radius:13px;
+    padding:4px 16px;
+}
+
+.row{
+    display:flex;
+    border-bottom:1px solid #e7edf3;
+    padding:12px 0;
+    gap:15px;
+}
+
+.row:last-child{
+    border-bottom:0;
+}
+
+.key{
+    width:43%;
+    font-weight:700;
+    color:#64748b;
+    font-size:13px;
+}
+
+.val{
+    flex:1;
+    font-size:14px;
+    color:#17212b;
+    font-weight:600;
+}
+
+.active{
+    color:#14804a;
+    font-weight:800;
+}
+
+.verification-box{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:13px;
+    padding:4px 16px;
+}
+
+.status-badge{
+    display:inline-block;
+    background:#e9f7ef;
+    color:#14804a;
+    border:1px solid #b8dec8;
+    border-radius:20px;
+    padding:5px 11px;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.4px;
+}
+
+.notice{
+    margin-top:22px;
+    padding:13px 15px;
+    border-radius:11px;
+    background:#f5f9fd;
+    border:1px solid #e1ebf5;
+    color:#64748b;
+    text-align:center;
+    font-size:12px;
+    line-height:1.6;
+}
+
+.lock-wrap{
+    text-align:center;
+    margin-top:18px;
+}
+
+.lock-btn{
+    display:inline-block;
+    padding:9px 16px;
+    border-radius:9px;
+    border:1px solid #d6dee7;
+    background:#fff;
+    color:#475569;
+    text-decoration:none;
+    font-size:12px;
+    font-weight:700;
+    transition:.2s;
+}
+
+.lock-btn:hover{
+    background:#f8fafc;
+    border-color:#b9c5d1;
+}
+
+.footer{
+    text-align:center;
+    color:#64748b;
+    font-size:11px;
+    margin-top:25px;
+    line-height:1.7;
+}
+
+.footer strong{
+    color:#475569;
+}
+
+@media(max-width:600px){
+
+    .header{
+        padding:21px 15px;
+    }
+
+    .wrap{
+        margin:20px auto;
+    }
+
+    .card{
+        padding:22px 17px;
+        border-radius:16px;
+    }
+
+    h1{
+        font-size:23px;
+    }
+
+    .profile{
+        grid-template-columns:1fr;
+        gap:18px;
+    }
+
+    .photo-frame{
+        width:155px;
+        margin:auto;
+    }
+
+    .photo{
+        height:200px;
+    }
+
+    .row{
+        display:block;
+    }
+
+    .key{
+        width:auto;
+        margin-bottom:5px;
+        display:block;
+    }
+
+    .val{
+        display:block;
+    }
+
+    .profile-meta,
+    .verification-box{
+        padding:4px 14px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <div class="brand">NEXORA</div>
+    <div class="subbrand">DATA SOLUTION</div>
+</div>
+
+<div class="wrap">
+<div class="card">
+
+{% if not verified %}
+
+<div class="portal-icon">✓</div>
+
+<h1>Employee Verification Portal</h1>
+
+<p class="muted">
+    Securely verify an authorized employee record using the
+    verification credentials provided by Nexora Data Solution.
+</p>
+
+<div class="security-note">
+    <span class="security-dot"></span>
+    Secure Verification System
+</div>
+
+<div class="form">
+
+{% if error %}
+<div class="error">{{ error }}</div>
+{% endif %}
+
+<form method="post">
+
+<label class="label" for="password">
+    Verification Password
+</label>
+
+<div class="input-wrap">
+
+<input
+    id="password"
+    name="password"
+    type="password"
+    autocomplete="off"
+    required
+    placeholder="Enter verification password"
+>
+
+<button
+    type="button"
+    class="toggle"
+    onclick="togglePassword()"
+    aria-label="Show or hide password"
+    id="toggleBtn"
+>
+    SHOW
+</button>
+
+</div>
+
+<button class="verify-btn" type="submit">
+    VERIFY EMPLOYEE
+</button>
+
+</form>
+
+</div>
+
+<div class="footer">
+    <strong>Authorized Verification Only</strong><br>
+    Nexora Data Solution · Employee Verification System
+</div>
+
+{% else %}
+
+<div class="verified">
+    ✓ VERIFIED EMPLOYEE RECORD
+</div>
+
+<div class="section-title">
+    Employee Profile
+</div>
+
+<div class="profile">
+
+<div class="photo-frame">
+<img
+    class="photo"
+    src="{{ url_for('static', filename='nisha.jpg') }}"
+    alt="Employee photo"
+>
+</div>
+
+<div class="profile-meta">
+
+{% for key,label in [
+    ('name','Employee Name'),
+    ('id','Employee ID'),
+    ('designation','Designation'),
+    ('department','Department'),
+    ('joining_date','Date of Joining'),
+    ('work_mode','Work Mode'),
+    ('status','Employment Status')
+] %}
+
+<div class="row">
+
+<div class="key">
+    {{ label }}
+</div>
+
+<div class="val {% if key=='status' %}active{% endif %}">
+    {% if key=='status' %}
+        <span class="status-badge">{{ employee[key]|upper }}</span>
+    {% else %}
+        {{ employee[key] }}
+    {% endif %}
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+</div>
+
+<div class="section-title">
+    Verification Details
+</div>
+
+<div class="verification-box">
+
+<div class="row">
+    <div class="key">Verification Status</div>
+    <div class="val">
+        <span class="status-badge">VERIFIED</span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="key">Record ID</div>
+    <div class="val">{{ employee.id }}</div>
+</div>
+
+<div class="row">
+    <div class="key">Verification Method</div>
+    <div class="val">Employee ID Verification</div>
+</div>
+
+<div class="row">
+    <div class="key">Verified At</div>
+    <div class="val">{{ verification_time or "Current Session" }}</div>
+</div>
+
+</div>
+
+<div class="notice">
+    This employee record has been successfully verified through
+    the Nexora Data Solution Employee Verification System.
+    The information displayed is intended for authorized verification purposes only.
+</div>
+
+<div class="lock-wrap">
+    <a class="lock-btn" href="{{ url_for('logout') }}">
+        🔒 Lock Record
+    </a>
+</div>
+
+<div class="footer">
+    <strong>Nexora Data Solution</strong><br>
+    Employee Verification System · Secure Record Access
+</div>
+
+{% endif %}
+
+</div>
+</div>
+
+<script>
+function togglePassword(){
+    const input = document.getElementById("password");
+    const button = document.getElementById("toggleBtn");
+
+    if(input.type === "password"){
+        input.type = "text";
+        button.textContent = "HIDE";
+    }else{
+        input.type = "password";
+        button.textContent = "SHOW";
+    }
+}
+</script>
+
+</body>
+</html>
