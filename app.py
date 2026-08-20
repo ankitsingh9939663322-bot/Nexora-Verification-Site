@@ -1,15 +1,22 @@
 import os
-from datetime import timedelta
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
-from flask import Flask, render_template, request, session, redirect, url_for
-
+from flask import (
+    Flask,
+    render_template,
+    request,
+    session,
+    redirect,
+    url_for
+)
 
 app = Flask(__name__)
 
 
-# ============================================================
+# =========================================================
 # SECURITY CONFIGURATION
-# ============================================================
+# =========================================================
 
 SESSION_SECRET = os.environ.get("SESSION_SECRET")
 VERIFY_PASSWORD = os.environ.get("VERIFY_PASSWORD")
@@ -26,13 +33,27 @@ if not VERIFY_PASSWORD:
 
 app.secret_key = SESSION_SECRET
 
-# Verification session expires after 5 minutes.
+# Session lifetime: 5 minutes
 app.permanent_session_lifetime = timedelta(minutes=5)
 
+# Secure browser session settings
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_SAMESITE="Lax"
+)
 
-# ============================================================
+
+# =========================================================
+# INDIA TIMEZONE
+# =========================================================
+
+INDIA_TZ = ZoneInfo("Asia/Kolkata")
+
+
+# =========================================================
 # EMPLOYEE RECORD
-# ============================================================
+# =========================================================
 
 EMPLOYEE = {
     "name": "Nisha Kumari",
@@ -45,9 +66,9 @@ EMPLOYEE = {
 }
 
 
-# ============================================================
+# =========================================================
 # HOME
-# ============================================================
+# =========================================================
 
 @app.route("/")
 def home():
@@ -59,40 +80,55 @@ def home():
     )
 
 
-# ============================================================
+# =========================================================
 # EMPLOYEE VERIFICATION
-# ============================================================
+# =========================================================
 
 @app.route("/verify/<employee_id>", methods=["GET", "POST"])
 def verify(employee_id):
 
-    # Only the registered employee record can be accessed.
+    # Validate employee ID
     if employee_id != EMPLOYEE["id"]:
         return render_template("invalid.html"), 404
 
     error = None
 
-    # Check current verification session.
+    # -----------------------------------------------------
+    # CHECK SESSION
+    # -----------------------------------------------------
+
     verified = (
         session.get("verified_employee") == employee_id
     )
+
+    # -----------------------------------------------------
+    # PASSWORD VERIFICATION
+    # -----------------------------------------------------
 
     if request.method == "POST":
 
         password = request.form.get(
             "password",
             ""
-        ).strip()
+        )
 
         if password == VERIFY_PASSWORD:
 
-            # Make the session temporary.
+            # Make session temporary
             session.permanent = True
 
-            # Store verified employee.
+            # Store verified employee
             session["verified_employee"] = employee_id
 
-            # Redirect after successful verification.
+            # Store verification time in IST
+            verified_time = datetime.now(INDIA_TZ)
+
+            session["verification_time"] = (
+                verified_time.strftime(
+                    "%d %B %Y, %I:%M:%S %p IST"
+                )
+            )
+
             return redirect(
                 url_for(
                     "verify",
@@ -103,23 +139,30 @@ def verify(employee_id):
         error = "Invalid verification password."
         verified = False
 
+    # -----------------------------------------------------
+    # VERIFICATION TIME
+    # -----------------------------------------------------
+
+    verification_time = session.get(
+        "verification_time"
+    )
+
     return render_template(
         "verify.html",
         employee=EMPLOYEE,
         verified=verified,
         error=error,
-        verification_time=None
+        verification_time=verification_time
     )
 
 
-# ============================================================
-# MANUAL LOCK
-# ============================================================
+# =========================================================
+# LOCK RECORD
+# =========================================================
 
 @app.route("/logout")
 def logout():
 
-    # Completely remove the verification session.
     session.clear()
 
     return redirect(
@@ -130,22 +173,23 @@ def logout():
     )
 
 
-# ============================================================
-# HEALTH CHECK
-# ============================================================
+# =========================================================
+# HEALTH CHECK FOR RENDER
+# =========================================================
 
 @app.route("/health")
 def health():
 
     return {
         "status": "ok",
-        "service": "Nexora Employee Verification"
+        "service": "Nexora Employee Verification",
+        "timezone": "Asia/Kolkata"
     }, 200
 
 
-# ============================================================
-# LOCAL DEVELOPMENT
-# ============================================================
+# =========================================================
+# RUN APPLICATION
+# =========================================================
 
 if __name__ == "__main__":
 
@@ -161,4 +205,4 @@ if __name__ == "__main__":
         port=port
     )
 
-
+           
