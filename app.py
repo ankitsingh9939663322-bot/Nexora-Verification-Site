@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timezone
 from flask import Flask, render_template, request, session, redirect, url_for
 
 app = Flask(__name__)
@@ -53,7 +54,12 @@ def verify(employee_id):
         password = request.form.get("password", "")
 
         if password == VERIFY_PASSWORD:
+
             session["verified_employee"] = employee_id
+
+            session["verification_time"] = datetime.now(
+                timezone.utc
+            ).strftime("%d %B %Y, %H:%M UTC")
 
             return redirect(
                 url_for("verify", employee_id=employee_id)
@@ -66,7 +72,8 @@ def verify(employee_id):
         "verify.html",
         employee=EMPLOYEE,
         verified=verified,
-        error=error
+        error=error,
+        verification_time=session.get("verification_time")
     )
 
 
@@ -74,6 +81,7 @@ def verify(employee_id):
 def logout():
 
     session.pop("verified_employee", None)
+    session.pop("verification_time", None)
 
     return redirect(
         url_for(
