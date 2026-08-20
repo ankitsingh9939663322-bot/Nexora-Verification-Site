@@ -28,6 +28,12 @@ EMPLOYEE = {
 }
 
 
+# Render health check
+@app.route("/health")
+def health():
+    return {"status": "ok"}, 200
+
+
 @app.route("/")
 def home():
     return redirect(url_for("verify", employee_id=EMPLOYEE["id"]))
@@ -35,6 +41,7 @@ def home():
 
 @app.route("/verify/<employee_id>", methods=["GET", "POST"])
 def verify(employee_id):
+
     if employee_id != EMPLOYEE["id"]:
         return render_template("invalid.html"), 404
 
@@ -42,11 +49,15 @@ def verify(employee_id):
     verified = session.get("verified_employee") == employee_id
 
     if request.method == "POST":
+
         password = request.form.get("password", "")
 
         if password == VERIFY_PASSWORD:
             session["verified_employee"] = employee_id
-            return redirect(url_for("verify", employee_id=employee_id))
+
+            return redirect(
+                url_for("verify", employee_id=employee_id)
+            )
 
         error = "Invalid verification password."
         verified = False
@@ -61,6 +72,7 @@ def verify(employee_id):
 
 @app.route("/logout")
 def logout():
+
     session.pop("verified_employee", None)
 
     return redirect(
@@ -72,6 +84,7 @@ def logout():
 
 
 if __name__ == "__main__":
+
     port = int(os.environ.get("PORT", 5000))
 
     app.run(
